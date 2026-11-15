@@ -34,11 +34,20 @@ database_url = URL.create(
 )
 
 
+# Enable SSL for cloud PostgreSQL providers such as Neon.
+connect_args = (
+    {"sslmode": "require"}
+    if settings.postgres_ssl
+    else {}
+)
+
+
 # Create the SQLModel database engine.
 engine = create_engine(
     database_url,
     echo=settings.debug,
     pool_pre_ping=True,
+    connect_args=connect_args,
 )
 
 

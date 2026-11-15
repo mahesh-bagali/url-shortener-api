@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     postgres_host: str = "localhost"
     postgres_port: int = 5432
     postgres_db: str = "url_shortener_db"
+    postgres_ssl: bool = False
 
     postgres_libpq_path: str = (
         r"C:\Program Files\PostgreSQL\18\bin"
