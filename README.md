@@ -1,77 +1,233 @@
 ﻿# URL Shortener API
 
-A REST API foundation for a URL shortener, built with Python and FastAPI. The current implementation validates submitted HTTP/HTTPS URLs and assigns each accepted URL a unique, random, URL-friendly short code. Codes are kept in process memory only and are lost when the application restarts.
+A backend URL shortening service built with **FastAPI, PostgreSQL, Redis, and Docker**. It allows authenticated users to create and manage short URLs, redirect visitors to original destinations, and track URL engagement through click analytics.
 
-## Requirements
+## Features
 
-- Python 3.10 or newer
-- pip
+- **URL Shortening** – Generate unique short codes for long URLs.
+- **User Authentication** – Secure registration and login using JWT authentication.
+- **URL Management** – Create, retrieve, update, and delete shortened URLs.
+- **Ownership Protection** – Users can manage only their own URLs.
+- **Redis Caching** – Cache URL mappings to improve redirect performance.
+- **Click Tracking** – Track URL visits and increment click counts.
+- **Analytics** – Retrieve URL engagement statistics.
+- **Rate Limiting** – Protect API endpoints against excessive requests.
+- **Input Validation** – Validate request data using Pydantic.
+- **Automated Testing** – Unit tests and integration tests using pytest.
+- **Docker Support** – Containerized application with Docker Compose and Redis.
 
-## Setup
+## Tech Stack
 
-Create and activate a virtual environment, then install the dependencies:
+| Technology | Purpose |
+|---|---|
+| Python | Programming language |
+| FastAPI | REST API framework |
+| Pydantic | Data validation and settings |
+| PostgreSQL | Relational database |
+| SQLModel | Database ORM |
+| Redis | Caching and rate limiting |
+| JWT | Authentication |
+| Pytest | Unit and integration testing |
+| Docker | Application containerization |
+| Docker Compose | Multi-container orchestration |
+
+## Architecture
+
+```text
+                 Client
+                   |
+                   v
+             FastAPI API
+                   |
+          +--------+--------+
+          |        |        |
+          v        v        v
+      PostgreSQL  Redis   Security
+          |        |        |
+          v        v        v
+       URL Data   Cache   JWT / Rate
+       User Data          Limiting
+          |
+          v
+      Analytics
+```
+
+## Project Structure
+
+```text
+url-shortener-api/
+│
+├── app/
+│   ├── database/
+│   │   ├── redis.py
+│   │   └── session.py
+│   │
+│   ├── models/
+│   │   ├── urls.py
+│   │   └── users.py
+│   │
+│   ├── routers/
+│   │   ├── auth.py
+│   │   ├── urls.py
+│   │   └── analytics.py
+│   │
+│   ├── schemas/
+│   │   ├── urls.py
+│   │   └── users.py
+│   │
+│   ├── services/
+│   │   ├── cache.py
+│   │   ├── rate_limiter.py
+│   │   ├── security.py
+│   │   └── short_codes.py
+│   │
+│   ├── config.py
+│   └── main.py
+│
+├── tests/
+├── .dockerignore
+├── .gitignore
+├── Dockerfile
+├── compose.yaml
+├── main.py
+├── requirements.txt
+└── README.md
+```
+
+## Getting Started
+
+### Prerequisites
+
+Install the following:
+
+- Python 3.14+
+- PostgreSQL
+- Redis
+- Git
+- Docker Desktop (for containerized execution)
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/mahesh-bagali/url-shortener-api.git
+cd url-shortener-api
+```
+
+### 2. Create a virtual environment
+
+```bash
+python -m venv .venv
+```
+
+Activate it on Windows:
 
 ```powershell
-py -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
+.venv\Scripts\activate
+```
+
+### 3. Install dependencies
+
+```bash
 pip install -r requirements.txt
 ```
 
-If PowerShell blocks activation, run the commands using `.venv\Scripts\python.exe` directly instead.
+### 4. Configure environment variables
 
-## Run locally
+Create a `.env` file in the project root and configure your local PostgreSQL, Redis, and JWT settings.
 
-```powershell
-uvicorn main:app --reload
+Never commit your actual `.env` file or credentials to GitHub.
+
+### 5. Start the application
+
+```bash
+uvicorn main:app --reload --port 8001
 ```
 
-The API will be available at `http://127.0.0.1:8000`. Interactive API documentation is available at `/docs`.
-
-## Endpoints
-
-| Method | Path | Purpose |
-| --- | --- | --- |
-| GET | `/` | Welcome message |
-| GET | `/health` | Basic process health response |
-| POST | `/urls` | Validate a URL and assign a unique short code |
-
-Example request:
-
-```json
-{
-  "original_url": "https://www.example.com/products"
-}
-```
-
-The response includes `message`, `original_url`, and a randomly generated seven-character `short_code`. Codes use letters and digits and are unique for the lifetime of the running process.
-
-## Tests
-
-Run the short-code unit tests with:
-
-```powershell
-py -m unittest tests.test_short_codes -v
-```
-
-## Configuration
-
-Local environment variables can be placed in a root `.env` file. It is excluded from Git; do not commit credentials or other secrets. The settings foundation is in `app/config.py`.
-
-## Project layout
+The API will be available at:
 
 ```text
-app/
-  database/       Database package foundation
-  models/         Data model package foundation
-  routers/        API route handlers
-  schemas/        Pydantic request and response schemas
-  services/       Application services, including short-code generation
-  config.py       Environment-backed settings
-  main.py         FastAPI application and general endpoints
-main.py           Uvicorn import entry point
-requirements.txt  Python dependencies
-tests/            Unit tests
+http://127.0.0.1:8001
 ```
 
-Database integration, redirects, authentication, and analytics are not implemented yet.
+## API Documentation
+
+FastAPI automatically generates interactive API documentation.
+
+| Documentation | URL |
+|---|---|
+| Swagger UI | http://127.0.0.1:8001/docs |
+| ReDoc | http://127.0.0.1:8001/redoc |
+| Health Check | http://127.0.0.1:8001/health |
+
+Use Swagger UI to explore and test the available endpoints.
+
+## Running with Docker Compose
+
+Make sure Docker Desktop is running.
+
+Build and start the API and Redis services:
+
+```bash
+docker compose up -d --build
+```
+
+Check running containers:
+
+```bash
+docker compose ps
+```
+
+View application logs:
+
+```bash
+docker compose logs -f api
+```
+
+Stop the services:
+
+```bash
+docker compose down
+```
+
+The API is exposed on port `8001`, while Redis is available internally to the API service.
+
+**Note:** PostgreSQL is configured as an external service in the current Docker Compose setup.
+
+## Running Tests
+
+Run the complete test suite:
+
+```bash
+python -m pytest -v
+```
+
+The project has successfully passed **48 tests**, covering unit and integration scenarios.
+
+Test coverage includes:
+
+- Short-code generation
+- URL validation
+- Authentication
+- URL ownership
+- Redis caching
+- Click tracking
+- Analytics
+- Security and rate limiting
+
+## Future Improvements
+
+- Custom short URLs
+- Expiration dates for shortened URLs
+- QR code generation
+- Advanced analytics
+- CI/CD automation
+
+## Author
+
+**Mahesh Bagali**
+
+GitHub: [@mahesh-bagali](https://github.com/mahesh-bagali)
+
+## License
+
+This project is currently shared without a specified open-source license.
