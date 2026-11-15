@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     redis_host: str = "localhost"
     redis_port: int = 6379
     redis_password: SecretStr = SecretStr("")
+    redis_ssl: bool = False
 
     model_config = SettingsConfigDict(
         env_file=".env",
