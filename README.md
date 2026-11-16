@@ -2,6 +2,11 @@
 
 A backend URL shortening service built with **FastAPI, PostgreSQL, Redis, and Docker**. It allows authenticated users to create and manage short URLs, redirect visitors to original destinations, and track URL engagement through click analytics.
 
+## Live Demo
+
+- **API Base URL:** https://url-shortener-api-nute.onrender.com
+- **Swagger Documentation:** https://url-shortener-api-nute.onrender.com/docs
+
 ## Features
 
 - **URL Shortening** – Generate unique short codes for long URLs.
@@ -13,7 +18,7 @@ A backend URL shortening service built with **FastAPI, PostgreSQL, Redis, and Do
 - **Analytics** – Retrieve URL engagement statistics.
 - **Rate Limiting** – Protect API endpoints against excessive requests.
 - **Input Validation** – Validate request data using Pydantic.
-- **Automated Testing** – Unit tests and integration tests using pytest.
+- **Automated Testing** – Unit and integration tests using pytest.
 - **Docker Support** – Containerized application with Docker Compose and Redis.
 
 ## Tech Stack
@@ -37,7 +42,7 @@ A backend URL shortening service built with **FastAPI, PostgreSQL, Redis, and Do
                  Client
                    |
                    v
-             FastAPI API
+              FastAPI API
                    |
           +--------+--------+
           |        |        |
@@ -49,7 +54,7 @@ A backend URL shortening service built with **FastAPI, PostgreSQL, Redis, and Do
        User Data          Limiting
           |
           v
-      Analytics
+       Analytics
 ```
 
 ## Project Structure
@@ -133,11 +138,29 @@ pip install -r requirements.txt
 
 ### 4. Configure environment variables
 
-Create a `.env` file in the project root and configure your local PostgreSQL, Redis, and JWT settings.
+Create a `.env` file in the project root.
 
-Never commit your actual `.env` file or credentials to GitHub.
+Configure the following variables with your local database and Redis credentials:
+
+| Variable | Description |
+|---|---|
+| POSTGRES_USER | PostgreSQL username |
+| POSTGRES_PASSWORD | PostgreSQL password |
+| POSTGRES_HOST | PostgreSQL host |
+| POSTGRES_PORT | PostgreSQL port |
+| POSTGRES_DB | PostgreSQL database name |
+| POSTGRES_SSL | Enable or disable PostgreSQL SSL |
+| JWT_SECRET_KEY | Secret key used for JWT authentication |
+| REDIS_HOST | Redis server hostname |
+| REDIS_PORT | Redis server port |
+| REDIS_PASSWORD | Redis password, if configured |
+| REDIS_SSL | Enable or disable Redis SSL |
+
+**Important:** Never commit your `.env` file or credentials to GitHub.
 
 ### 5. Start the application
+
+Make sure PostgreSQL and Redis are running, then execute:
 
 ```bash
 uvicorn main:app --reload --port 8001
@@ -145,9 +168,7 @@ uvicorn main:app --reload --port 8001
 
 The API will be available at:
 
-```text
 http://127.0.0.1:8001
-```
 
 ## API Documentation
 
@@ -189,7 +210,7 @@ Stop the services:
 docker compose down
 ```
 
-The API is exposed on port `8001`, while Redis is available internally to the API service.
+The API is exposed on port `8001`. Redis is available to the API through the internal Docker network and is also mapped to port `6379` on the host for local testing.
 
 **Note:** PostgreSQL is configured as an external service in the current Docker Compose setup.
 
@@ -201,7 +222,7 @@ Run the complete test suite:
 python -m pytest -v
 ```
 
-The project has successfully passed **48 tests**, covering unit and integration scenarios.
+The project has successfully passed **48 tests**.
 
 Test coverage includes:
 
