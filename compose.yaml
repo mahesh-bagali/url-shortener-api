@@ -21,6 +21,8 @@ services:
   redis:
     image: redis:8
     container_name: url-shortener-compose-redis
+    ports:
+      - "6379:6379"
     volumes:
       - redis_data:/data
     healthcheck:
